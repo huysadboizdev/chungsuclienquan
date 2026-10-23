@@ -101,15 +101,28 @@ body {
   flex: 1;
 }
 
-/* Header */
+/* Header (Sticky with Modern Glassmorphism Blur) */
 .app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 0 20px;
+  padding: 12px 18px;
+  margin: -28px -18px 24px -18px;
+  background: rgba(248, 250, 252, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-subtle);
-  margin-bottom: 24px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
   gap: 12px;
+  transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+[data-theme="dark"] .app-header {
+  background: rgba(11, 15, 25, 0.92);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 .brand {
@@ -883,11 +896,11 @@ code {
 /* Responsive Breakpoints & Mobile Optimization */
 @media (max-width: 480px) {
   .container {
-    padding: 12px 14px 36px;
+    padding: 20px 14px 36px;
   }
   .app-header {
-    padding-bottom: 16px;
-    margin-bottom: 16px;
+    margin: -20px -14px 18px -14px;
+    padding: 10px 14px;
   }
   .card {
     padding: 18px 14px;
