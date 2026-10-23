@@ -331,6 +331,13 @@ async function loadSettings() {
     if (!data.success) return;
 
     const s = data.settings;
+    const effectiveAppUrl = (s.app_url || window.location.origin).replace(/\/+$/, '');
+
+    const appUrlEl = document.getElementById('set_app_url');
+    if (appUrlEl) {
+      appUrlEl.value = s.app_url || '';
+    }
+
     document.getElementById('set_bank_id').value = s.bank_id || 'MB';
     document.getElementById('set_bank_account_no').value = s.bank_account_no || '';
     document.getElementById('set_bank_account_name').value = s.bank_account_name || '';
@@ -340,11 +347,12 @@ async function loadSettings() {
     document.getElementById('set_webhook_api_key').value = s.webhook_api_key || '';
     document.getElementById('set_site_notice').value = s.site_notice || '';
 
-    // Webhook URL display
-    const webhookUrl = `${window.location.origin}/api/webhook/payment`;
-    document.getElementById('webhook-url-display').value = webhookUrl;
+    // Webhook URLs (Ưu tiên cấu hình từ server qua .env/DB)
+    const webhookUrl = s.payment_webhook_url || `${effectiveAppUrl}/api/webhook/payment`;
+    const whInput = document.getElementById('webhook-url-display');
+    if (whInput) whInput.value = webhookUrl;
 
-    const tgWebhookUrl = `${window.location.origin}/api/telegram/webhook`;
+    const tgWebhookUrl = s.telegram_webhook_url || `${effectiveAppUrl}/api/telegram/webhook`;
     const tgEl = document.getElementById('telegram-webhook-url-display');
     if (tgEl) tgEl.value = tgWebhookUrl;
   } catch (err) {
@@ -473,10 +481,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Live update webhook URLs when editing APP_URL
+  document.getElementById('set_app_url')?.addEventListener('input', (e) => {
+    const base = (e.target.value.trim() || window.location.origin).replace(/\/+$/, '');
+    const whEl = document.getElementById('webhook-url-display');
+    const tgEl = document.getElementById('telegram-webhook-url-display');
+    if (whEl) whEl.value = `${base}/api/webhook/payment`;
+    if (tgEl) tgEl.value = `${base}/api/telegram/webhook`;
+  });
+
   // Settings form
   document.getElementById('settings-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const body = {
+      app_url: document.getElementById('set_app_url')?.value.trim() || '',
       bank_id: document.getElementById('set_bank_id').value.trim(),
       bank_account_no: document.getElementById('set_bank_account_no').value.trim(),
       bank_account_name: document.getElementById('set_bank_account_name').value.trim(),

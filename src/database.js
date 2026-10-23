@@ -129,6 +129,7 @@ async function initDatabase() {
   // Cấu hình ban đầu sạch (Không mock tên người hay STK giả)
   const defaultSettings = {
     admin_password: process.env.ADMIN_PASSWORD || 'admin123456',
+    app_url: process.env.APP_URL || '',
     bank_id: process.env.BANK_ID || '',
     bank_account_no: process.env.BANK_ACCOUNT_NO || '',
     bank_account_name: process.env.BANK_ACCOUNT_NAME || '',

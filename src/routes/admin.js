@@ -348,6 +348,19 @@ router.get('/settings', requireAdminAuth, async (req, res) => {
         settings[r.key] = r.value;
       }
     }
+    // Xác định APP_URL: ưu tiên biến môi trường process.env.APP_URL (từ file .env), nếu không có thì lấy từ DB
+    const effectiveAppUrl = (process.env.APP_URL || settings.app_url || '').trim().replace(/\/+$/, '');
+    settings.app_url = effectiveAppUrl;
+    settings.env_app_url = process.env.APP_URL || '';
+
+    // Đường dẫn webhook linh hoạt từ biến môi trường hoặc tự động ghép theo APP_URL
+    settings.payment_webhook_url =
+      process.env.PAYMENT_WEBHOOK_URL ||
+      (effectiveAppUrl ? `${effectiveAppUrl}/api/webhook/payment` : '');
+    settings.telegram_webhook_url =
+      process.env.TELEGRAM_WEBHOOK_URL ||
+      (effectiveAppUrl ? `${effectiveAppUrl}/api/telegram/webhook` : '');
+
     res.json({ success: true, settings });
   } catch (err) {
     console.error('Lỗi GET /api/admin/settings:', err);
@@ -362,6 +375,7 @@ router.get('/settings', requireAdminAuth, async (req, res) => {
 router.post('/settings', requireAdminAuth, async (req, res) => {
   try {
     const allowedKeys = [
+      'app_url',
       'bank_id',
       'bank_account_no',
       'bank_account_name',

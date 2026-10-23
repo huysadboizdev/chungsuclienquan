@@ -263,6 +263,23 @@
     <!-- TAB 3: Cài Đặt Hệ Thống -->
     <div id="tab-settings" class="tab-content" style="display: none;">
       <form id="settings-form">
+        <!-- Tên Miền / APP_URL -->
+        <div class="settings-section">
+          <div class="settings-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+            1. Tên Miền / Địa Chỉ Web (APP_URL cấu hình trong .env)
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tên Miền / URL Chính Của Web (APP_URL)</label>
+            <input type="text" id="set_app_url" class="form-input mono" placeholder="VD: https://tenmiencuaban.com hoặc http://localhost:3000">
+            <p class="input-hint">Được tự động nạp từ biến <code>APP_URL</code> trong file <code>.env</code>. Bạn có thể sửa trực tiếp tại đây hoặc sửa file <code>.env</code>. Hai đường dẫn webhook bên dưới sẽ tự động cập nhật theo URL này.</p>
+          </div>
+        </div>
+
         <!-- Ngân Hàng VietQR -->
         <div class="settings-section">
           <div class="settings-title">
@@ -270,7 +287,7 @@
               <rect x="2" y="5" width="20" height="14" rx="2"></rect>
               <line x1="2" y1="10" x2="22" y2="10"></line>
             </svg>
-            1. Cấu Hình Tài Khoản Ngân Hàng (VietQR Chuẩn NAPAS)
+            2. Cấu Hình Tài Khoản Ngân Hàng (VietQR Chuẩn NAPAS)
           </div>
           <div class="settings-grid">
             <div class="form-group">
@@ -296,7 +313,7 @@
               <line x1="22" y1="2" x2="11" y2="13"></line>
               <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
             </svg>
-            2. Cấu Hình Telegram Bot Báo Đơn Thời Gian Thực
+            3. Cấu Hình Telegram Bot Báo Đơn Thời Gian Thực
           </div>
           <div class="settings-grid">
             <div class="form-group">
@@ -320,10 +337,10 @@
           <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-subtle);">
             <label class="form-label">Đường dẫn Webhook Telegram (Dành cho nút bấm Hoàn Thành trên Telegram)</label>
             <div class="input-wrapper" style="margin-bottom: 8px;">
-              <input type="text" id="telegram-webhook-url-display" class="form-input mono" readonly>
+              <input type="text" id="telegram-webhook-url-display" class="form-input mono" placeholder="https://tenmien.com/api/telegram/webhook">
               <button type="button" class="btn-paste" id="btn-copy-telegram-webhook">Chép URL</button>
             </div>
-            <p class="input-hint">Đường dẫn này nhận tín hiệu khi bạn bấm "✅ BẤM HOÀN THÀNH" ngay trên ứng dụng Telegram.</p>
+            <p class="input-hint">Được tự động cấu hình từ <code>APP_URL</code> trong <code>.env</code>. Bạn có thể sửa trực tiếp nếu muốn.</p>
           </div>
 
           <div style="display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap;">
@@ -351,14 +368,15 @@
               <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
               <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
             </svg>
-            3. Webhook Thanh Toán Tự Động (SePay / Casso / Ngân Hàng)
+            4. Webhook Thanh Toán Tự Động (SePay / Casso / Ngân Hàng)
           </div>
           <div class="form-group">
             <label class="form-label">Đường Dẫn Webhook Nhận Tiền (Dán vào SePay)</label>
             <div class="input-wrapper">
-              <input type="text" id="webhook-url-display" class="form-input mono" readonly>
+              <input type="text" id="webhook-url-display" class="form-input mono" placeholder="https://tenmien.com/api/webhook/payment">
               <button type="button" class="btn-paste" id="btn-copy-webhook-url">Chép URL</button>
             </div>
+            <p class="input-hint">Được tự động cấu hình từ <code>APP_URL</code> trong <code>.env</code>. Bạn có thể sửa trực tiếp hoặc chép dán vào SePay.</p>
           </div>
           <div class="form-group">
             <label class="form-label">Webhook API Key (Khóa Bí Mật)</label>
@@ -375,7 +393,7 @@
               <line x1="12" y1="16" x2="12" y2="12"></line>
               <line x1="12" y1="8" x2="12.01" y2="8"></line>
             </svg>
-            4. Thông Báo Web & Đổi Mật Khẩu Admin
+            5. Thông Báo Web & Đổi Mật Khẩu Admin
           </div>
           <div class="form-group">
             <label class="form-label">Nội Dung Thông Báo Đầu Web</label>
