@@ -1,0 +1,33 @@
+# Cấu hình Nginx Reverse Proxy cho Web Chung Sức Liên Quân
+# Lưu file này tại /etc/nginx/sites-available/chungsuclienquan.conf
+# Kích hoạt: sudo ln -s /etc/nginx/sites-available/chungsuclienquan.conf /etc/nginx/sites-enabled/
+# Kiểm tra: sudo nginx -t && sudo systemctl reload nginx
+
+server {
+    listen 80;
+    server_name yourdomain.com www.yourdomain.com; # Thay bằng tên miền của bạn
+
+    # Bật nén Gzip tăng tốc độ tải trên Mobile
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml image/svg+xml;
+    gzip_min_length 1000;
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    # Cache static assets (CSS, JS, SVG)
+    location ~* \.(css|js|svg|png|jpg|jpeg|ico|woff|woff2)$ {
+        proxy_pass http://127.0.0.1:3000;
+        expires 7d;
+        add_header Cache-Control "public, no-transform";
+    }
+}
