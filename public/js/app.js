@@ -79,9 +79,11 @@ function renderPackages(packages) {
   if (!container) return;
 
   if (packages.length === 0) {
+    selectedPackageId = null;
     container.innerHTML = `
-      <div style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 0.85rem;">
-        Hiện chưa có gói dịch vụ nào đang mở bán.
+      <div style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.85rem; background: var(--bg-input); border: 1px dashed var(--border-subtle); border-radius: var(--radius-md);">
+        <p style="margin-bottom: 6px; font-weight: 600; color: var(--text-main);">Hiện chưa có gói dịch vụ nào</p>
+        <p>Chủ website vui lòng đăng nhập vào trang <a href="/admin" target="_blank" style="color: #60a5fa; text-decoration: underline; font-weight: 600;">Quản Trị</a> để thêm các gói buff dịch vụ thực tế.</p>
       </div>
     `;
     return;

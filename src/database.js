@@ -8,9 +8,6 @@ if (!fs.existsSync(dataDir)) {
 
 const dbPath = process.env.DB_PATH || path.join(dataDir, 'database.sqlite');
 
-let dbDriver = null;
-
-// Kiểm tra xem Node.js hiện tại có hỗ trợ node:sqlite chuẩn không (Node 22+)
 let hasNodeSqlite = false;
 try {
   const sqlite = require('node:sqlite');
@@ -52,7 +49,6 @@ if (hasNodeSqlite) {
     }
   };
 } else {
-  // Fallback sang sqlite3 cho Node 18/20
   const sqlite3 = require('sqlite3').verbose();
   const rawDb = new sqlite3.Database(dbPath);
 
@@ -93,7 +89,7 @@ if (hasNodeSqlite) {
   };
 }
 
-// Khởi tạo bảng và dữ liệu mẫu
+// Khởi tạo bảng cơ sở dữ liệu (KHÔNG tạo dữ liệu giả/mock)
 async function initDatabase() {
   await db.exec(`PRAGMA journal_mode = WAL;`);
 
@@ -130,53 +126,18 @@ async function initDatabase() {
     );
   `);
 
-  // Seed default packages if empty
-  const packageCount = await db.get(`SELECT COUNT(*) as count FROM packages`);
-  if (!packageCount || packageCount.count === 0) {
-    const defaultPackages = [
-      {
-        name: 'Gói Cơ Bản (5 Lượt)',
-        price: 10000,
-        description: 'Hỗ trợ 5 lượt bấm mã chung sức sự kiện',
-        badge: 'Cơ bản',
-        sort_order: 1
-      },
-      {
-        name: 'Gói Tiết Kiệm (15 Lượt)',
-        price: 25000,
-        description: 'Hỗ trợ 15 lượt bấm mã + Tốc độ xử lý ưu tiên',
-        badge: 'Phổ biến',
-        sort_order: 2
-      },
-      {
-        name: 'Gói Siêu Tốc (Full Rương Quà)',
-        price: 50000,
-        description: 'Hỗ trợ max điểm sự kiện, cam kết hoàn thành 100%',
-        badge: 'Khuyên dùng',
-        sort_order: 3
-      }
-    ];
-
-    for (const pkg of defaultPackages) {
-      await db.run(
-        `INSERT INTO packages (name, price, description, badge, sort_order, is_active) VALUES (?, ?, ?, ?, ?, 1)`,
-        [pkg.name, pkg.price, pkg.description, pkg.badge, pkg.sort_order]
-      );
-    }
-  }
-
-  // Seed default settings if not exists
+  // Cấu hình ban đầu sạch (Không mock tên người hay STK giả)
   const defaultSettings = {
     admin_password: process.env.ADMIN_PASSWORD || 'admin123456',
-    bank_id: process.env.BANK_ID || 'MB',
-    bank_account_no: process.env.BANK_ACCOUNT_NO || '0987654321',
-    bank_account_name: process.env.BANK_ACCOUNT_NAME || 'NGUYEN VAN A',
+    bank_id: process.env.BANK_ID || '',
+    bank_account_no: process.env.BANK_ACCOUNT_NO || '',
+    bank_account_name: process.env.BANK_ACCOUNT_NAME || '',
     vietqr_template: 'compact2',
     telegram_bot_token: process.env.TELEGRAM_BOT_TOKEN || '',
     telegram_chat_id: process.env.TELEGRAM_CHAT_ID || '',
     telegram_notify_enabled: '1',
     webhook_api_key: process.env.WEBHOOK_API_KEY || 'sepay_webhook_secret_key',
-    site_notice: 'Hệ thống hỗ trợ buff chung sức Liên Quân Mobile tự động 24/7. Vui lòng chuyển khoản đúng cú pháp mã đơn hàng để được kích hoạt ngay!'
+    site_notice: 'Hệ thống hỗ trợ buff chung sức Liên Quân Mobile tự động 24/7. Vui lòng chuyển khoản đúng cú pháp mã đơn hàng!'
   };
 
   for (const [key, value] of Object.entries(defaultSettings)) {
