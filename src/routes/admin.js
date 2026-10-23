@@ -5,7 +5,8 @@ const { db } = require('../database');
 const {
   sendTelegramMessage,
   notifyCompletedOrder,
-  notifyCancelledOrder
+  notifyCancelledOrder,
+  setTelegramWebhook
 } = require('../services/telegram');
 
 const SECRET_SALT = process.env.ADMIN_SECRET_KEY || 'cslk_super_secret_jwt_key_2026';
@@ -431,6 +432,29 @@ Thời gian: <code>${new Date().toLocaleString('vi-VN')}</code>
     res.json({ success: true, message: 'Đã gửi tin nhắn test đến Telegram thành công!' });
   } catch (err) {
     console.error('Lỗi test-telegram:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+/**
+ * POST /api/admin/set-telegram-webhook
+ * Kích hoạt Webhook Telegram Bot để nhận sự kiện bấm nút
+ */
+router.post('/set-telegram-webhook', requireAdminAuth, async (req, res) => {
+  try {
+    const { webhook_url } = req.body;
+    if (!webhook_url) {
+      return res.status(400).json({ success: false, message: 'Thiếu đường dẫn webhook' });
+    }
+
+    const result = await setTelegramWebhook(webhook_url);
+    if (!result.success) {
+      return res.status(400).json({ success: false, message: result.message });
+    }
+
+    res.json({ success: true, message: 'Kích hoạt Webhook Telegram thành công!' });
+  } catch (err) {
+    console.error('Lỗi set-telegram-webhook:', err);
     res.status(500).json({ success: false, message: err.message });
   }
 });

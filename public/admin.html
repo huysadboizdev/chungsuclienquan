@@ -314,13 +314,31 @@
               </select>
             </div>
           </div>
-          <button type="button" class="btn-secondary" id="btn-test-telegram" style="margin-top: 8px;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="22" y1="2" x2="11" y2="13"></line>
-              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-            </svg>
-            Bấm để kiểm tra gửi tin nhắn thử lên Telegram
-          </button>
+          <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-subtle);">
+            <label class="form-label">Đường dẫn Webhook Telegram (Dành cho nút bấm Hoàn Thành trên Telegram)</label>
+            <div class="input-wrapper" style="margin-bottom: 8px;">
+              <input type="text" id="telegram-webhook-url-display" class="form-input mono" readonly>
+              <button type="button" class="btn-paste" id="btn-copy-telegram-webhook">Chép URL</button>
+            </div>
+            <p class="input-hint">Đường dẫn này nhận tín hiệu khi bạn bấm "✅ BẤM HOÀN THÀNH" ngay trên ứng dụng Telegram.</p>
+          </div>
+
+          <div style="display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap;">
+            <button type="button" class="btn-secondary" id="btn-test-telegram">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+              Gửi tin nhắn test Telegram
+            </button>
+            <button type="button" class="btn-primary" id="btn-register-telegram-webhook" style="width: auto; height: 38px; font-size: 0.85rem; padding: 0 16px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              Bấm để Kích Hoạt Nút Bấm Telegram
+            </button>
+          </div>
         </div>
 
         <!-- Webhook SePay / Casso -->

@@ -343,6 +343,10 @@ async function loadSettings() {
     // Webhook URL display
     const webhookUrl = `${window.location.origin}/api/webhook/payment`;
     document.getElementById('webhook-url-display').value = webhookUrl;
+
+    const tgWebhookUrl = `${window.location.origin}/api/telegram/webhook`;
+    const tgEl = document.getElementById('telegram-webhook-url-display');
+    if (tgEl) tgEl.value = tgWebhookUrl;
   } catch (err) {
     console.error('Lỗi loadSettings:', err);
   }
@@ -532,5 +536,43 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-copy-webhook-url')?.addEventListener('click', () => {
     const url = document.getElementById('webhook-url-display').value;
     copyToClipboard(url, 'Đường dẫn Webhook');
+  });
+
+  // Copy Telegram Webhook URL
+  document.getElementById('btn-copy-telegram-webhook')?.addEventListener('click', () => {
+    const url = document.getElementById('telegram-webhook-url-display').value;
+    copyToClipboard(url, 'Đường dẫn Telegram Webhook');
+  });
+
+  // Register Telegram Webhook Button
+  document.getElementById('btn-register-telegram-webhook')?.addEventListener('click', async () => {
+    const btn = document.getElementById('btn-register-telegram-webhook');
+    const url = document.getElementById('telegram-webhook-url-display').value;
+
+    if (!url.startsWith('https://')) {
+      alert('Lưu ý: Telegram yêu cầu đường dẫn Webhook phải có HTTPS (khi bạn triển khai lên VPS có SSL tên miền). Nếu đang chạy localhost HTTP, Telegram sẽ không nhận kết nối trực tiếp được.');
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'ĐANG KÍCH HOẠT...';
+
+    try {
+      const res = await fetch('/api/admin/set-telegram-webhook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ webhook_url: url })
+      });
+      const data = await res.json();
+      if (!data.success) {
+        showToast(data.message || 'Không thể kích hoạt webhook telegram', true);
+      } else {
+        showToast('Kích hoạt Webhook Telegram thành công! Bây giờ bạn có thể bấm nút trên Telegram.');
+      }
+    } catch (err) {
+      showToast('Lỗi kết nối máy chủ', true);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Bấm để Kích Hoạt Nút Bấm Telegram';
+    }
   });
 });

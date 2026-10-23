@@ -8,6 +8,7 @@ const { initDatabase } = require('./database');
 const apiRoutes = require('./routes/api');
 const webhookRoutes = require('./routes/webhook');
 const adminRoutes = require('./routes/admin');
+const telegramRoutes = require('./routes/telegram');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -26,6 +27,7 @@ app.use(express.static(publicDir));
 app.use('/api', apiRoutes);
 app.use('/api/webhook', webhookRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/telegram', telegramRoutes);
 
 // Điều hướng trang thân thiện (Clean URLs)
 app.get('/', (req, res) => {
