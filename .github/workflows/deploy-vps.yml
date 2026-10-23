@@ -36,4 +36,4 @@ jobs:
           ssh -o BatchMode=yes -o StrictHostKeyChecking=yes \
             -i "$HOME/.ssh/id_ed25519" \
             "$VPS_USER@$VPS_HOST" \
-            'cd /var/www/chungsuclienquan && git pull --ff-only origin main && npm ci --omit=dev && pm2 restart chungsuclienquan'
+            'export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" && nvm use --silent 20 && cd /var/www/chungsuclienquan && git pull --ff-only origin main && npm ci --omit=dev && pm2 restart chungsuclienquan'
