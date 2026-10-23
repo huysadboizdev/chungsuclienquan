@@ -24,11 +24,11 @@ function generateVietQRUrl({
 }
 
 /**
- * Trích xuất mã đơn hàng dạng CSLK-XXXXXX từ nội dung chuyển khoản ngân hàng
+ * Trích xuất mã thanh toán mới hoặc mã đơn cũ từ nội dung chuyển khoản
  */
 function extractOrderCode(text) {
   if (!text || typeof text !== 'string') return null;
-  const match = text.match(/CSLK-[A-Z0-9]{4,10}/i);
+  const match = text.match(/CHUNGSUCHUYDEV\d{6,}/i) || text.match(/CSLK-[A-Z0-9]{4,10}/i);
   return match ? match[0].toUpperCase() : null;
 }
 

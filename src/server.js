@@ -15,6 +15,10 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
+
+// Parse payment webhooks as raw bytes so HMAC is checked against the exact payload.
+app.use('/api/webhook', express.raw({ type: 'application/json', limit: '100kb' }), webhookRoutes);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -25,7 +29,6 @@ app.use(express.static(publicDir));
 
 // API Routes
 app.use('/api', apiRoutes);
-app.use('/api/webhook', webhookRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/telegram', telegramRoutes);
 

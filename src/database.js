@@ -108,6 +108,7 @@ async function initDatabase() {
     CREATE TABLE IF NOT EXISTS orders (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       order_code TEXT UNIQUE NOT NULL,
+      payment_code TEXT UNIQUE,
       invite_code TEXT NOT NULL,
       package_id INTEGER NOT NULL,
       package_name TEXT NOT NULL,
@@ -126,6 +127,14 @@ async function initDatabase() {
     );
   `);
 
+  // Add payment_code to existing installations without disturbing existing orders.
+  const orderColumns = await db.all(`PRAGMA table_info(orders)`);
+  if (!orderColumns.some((column) => column.name === 'payment_code')) {
+    await db.exec(`ALTER TABLE orders ADD COLUMN payment_code TEXT`);
+  }
+  await db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_orders_payment_code ON orders(payment_code)`);
+  await db.run(`DELETE FROM settings WHERE key = 'webhook_api_key'`);
+
   // Cấu hình ban đầu sạch (Không mock tên người hay STK giả)
   const defaultSettings = {
     admin_password: process.env.ADMIN_PASSWORD || 'admin123456',
@@ -137,7 +146,6 @@ async function initDatabase() {
     telegram_bot_token: process.env.TELEGRAM_BOT_TOKEN || '',
     telegram_chat_id: process.env.TELEGRAM_CHAT_ID || '',
     telegram_notify_enabled: '1',
-    webhook_api_key: process.env.WEBHOOK_API_KEY || 'sepay_webhook_secret_key',
     site_notice: 'Hệ thống Chung Sức Liên Quân Huy Dev hỗ trợ buff sự kiện tự động 24/7. Vui lòng chuyển khoản đúng cú pháp mã đơn hàng!'
   };
 

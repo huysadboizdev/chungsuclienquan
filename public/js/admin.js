@@ -344,7 +344,6 @@ async function loadSettings() {
     document.getElementById('set_telegram_bot_token').value = s.telegram_bot_token || '';
     document.getElementById('set_telegram_chat_id').value = s.telegram_chat_id || '';
     document.getElementById('set_telegram_notify_enabled').value = s.telegram_notify_enabled || '1';
-    document.getElementById('set_webhook_api_key').value = s.webhook_api_key || '';
     document.getElementById('set_site_notice').value = s.site_notice || '';
 
     // Webhook URLs (Ưu tiên cấu hình từ server qua .env/DB)
@@ -501,7 +500,6 @@ document.addEventListener('DOMContentLoaded', () => {
       telegram_bot_token: document.getElementById('set_telegram_bot_token').value.trim(),
       telegram_chat_id: document.getElementById('set_telegram_chat_id').value.trim(),
       telegram_notify_enabled: document.getElementById('set_telegram_notify_enabled').value,
-      webhook_api_key: document.getElementById('set_webhook_api_key').value.trim(),
       site_notice: document.getElementById('set_site_notice').value.trim(),
       new_password: document.getElementById('set_new_password').value.trim()
     };

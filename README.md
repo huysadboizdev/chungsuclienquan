@@ -2,7 +2,7 @@
 
 Hệ thống web chuyên nghiệp, tối giản, chuẩn Mobile-first hỗ trợ dịch vụ buff mã Chung Sức Liên Quân Mobile:
 - **Khách hàng:** Dán mã chung sức (tự động làm sạch mã) -> Chọn gói dịch vụ -> Quét mã VietQR động -> Theo dõi tiến trình đơn hàng thời gian thực.
-- **Thanh toán:** Tự động nhận diện thanh toán qua Webhook SePay / Casso / Ngân hàng (chuyển trạng thái sang `Đang xử lý` ngay khi tiền vào tài khoản).
+- **Thanh toán:** Nhận giao dịch qua webhook SePay xác thực HMAC-SHA256; mỗi đơn có nội dung chuyển khoản riêng để tự động đối chiếu.
 - **Thông báo:** Telegram Bot gửi tin nhắn tự động khi có đơn mới & khi khách thanh toán thành công.
 - **Admin Panel:** Đăng nhập bảo mật, thống kê doanh thu, quản lý đơn hàng với nút 1-chạm sao chép mã chung sức, CRUD gói dịch vụ tùy biến và cài đặt hệ thống.
 - **Thiết kế:** 100% SVG đơn sắc tinh gọn, không màu mè, tối ưu hóa cho màn hình điện thoại và máy tính.
@@ -109,7 +109,7 @@ PORT=3000
 NODE_ENV=production
 ADMIN_SECRET_KEY=khoa_bao_mat_jwt_ngau_nhien_123456
 ADMIN_PASSWORD=mat_khau_admin_cua_ban
-WEBHOOK_API_KEY=khoa_sepay_tu_chon
+SEPAY_WEBHOOK_SECRET=secret_key_hmac_lay_tu_sepay
 BANK_ID=MB
 BANK_ACCOUNT_NO=0987654321
 BANK_ACCOUNT_NAME=NGUYEN VAN A
@@ -123,6 +123,17 @@ pm2 start ecosystem.config.js
 pm2 save
 pm2 startup
 ```
+
+#### Tự động triển khai từ GitHub
+
+Workflow `.github/workflows/deploy-vps.yml` chạy sau mỗi lần push lên `main`. Trong GitHub, vào **Settings → Secrets and variables → Actions → New repository secret** và thêm:
+
+- `VPS_HOST`: IP hoặc hostname của VPS.
+- `VPS_USER`: tài khoản SSH dùng để triển khai.
+- `VPS_SSH_PRIVATE_KEY`: private key SSH; public key tương ứng phải có trong `~/.ssh/authorized_keys` trên VPS.
+- `VPS_KNOWN_HOSTS`: host key của VPS, lấy bằng `ssh-keyscan -H <IP_VPS>` rồi lưu nguyên kết quả.
+
+Workflow kết nối vào `/var/www/chungsuclienquan`, kéo `main`, chạy `npm ci --omit=dev` và khởi động lại PM2. VPS cần có bản clone của repo tại đường dẫn này; nếu repo private, tài khoản triển khai trên VPS cũng cần quyền đọc repo để `git pull` thành công. Có thể chạy workflow thủ công trong tab **Actions**.
 
 ### Bước 5: Cấu hình Nginx & SSL HTTPS (Miễn Phí)
 1. Tạo file cấu hình Nginx:
@@ -150,8 +161,9 @@ pm2 startup
    - **URL Webhook:** `https://yourdomain.com/api/webhook/payment`
    - **Phương thức:** `POST`
    - **Kiểu dữ liệu:** `JSON`
-   - **API Key (Header Authorization):** `Apikey <chuỗi_webhook_api_key_cua_ban>`
-4. Khi khách chuyển khoản đúng mã đơn `CSLK-XXXXXX`, SePay tự động gửi dữ liệu sang, hệ thống chuyển đơn sang **Đang xử lý** và gửi tin nhắn Telegram cho Admin ngay lập tức!
+   - **Phương thức xác thực:** `HMAC-SHA256`
+   - Tạo Secret Key trong SePay và đặt cùng giá trị vào `SEPAY_WEBHOOK_SECRET` trong `.env` trên máy chủ. Không đưa secret vào mã nguồn hoặc trang Admin.
+4. Mỗi đơn tạo nội dung chuyển khoản `CHUNGSUCHUYDEV` kèm 10 chữ số ngẫu nhiên. SePay ký webhook bằng HMAC-SHA256; server xác minh chữ ký và timestamp trước khi đối chiếu giao dịch, chuyển đơn sang **Đang xử lý** và gửi thông báo Telegram.
 
 ---
 

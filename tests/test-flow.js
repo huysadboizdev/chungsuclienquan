@@ -1,11 +1,12 @@
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 
 // Sử dụng file CSDL riêng biệt cho test để KHÔNG làm ô nhiễm database chính
 const testDbPath = path.join(__dirname, '..', 'data', 'test_e2e.sqlite');
 process.env.DB_PATH = testDbPath;
 process.env.ADMIN_PASSWORD = 'admin123456';
-process.env.WEBHOOK_API_KEY = 'sepay_webhook_secret_key';
+process.env.SEPAY_WEBHOOK_SECRET = 'sepay_hmac_test_secret';
 
 // Xóa file test cũ nếu có
 try { if (fs.existsSync(testDbPath)) fs.unlinkSync(testDbPath); } catch (e) {}
@@ -113,6 +114,9 @@ async function runTests() {
     if (!createdOrder.order_code.startsWith('CSLK-')) {
       throw new Error(`Test 4 Failed: Invalid order code ${createdOrder.order_code}`);
     }
+    if (!/^CHUNGSUCHUYDEV\d{10}$/.test(createdOrder.bank.transfer_content)) {
+      throw new Error(`Test 4 Failed: Invalid payment content ${createdOrder.bank.transfer_content}`);
+    }
     if (createdOrder.invite_code !== 'CSLQ_TEST_HERO_999') {
       throw new Error(`Test 4 Failed: Invite code was not cleanly extracted: ${createdOrder.invite_code}`);
     }
@@ -128,20 +132,22 @@ async function runTests() {
 
     // TEST 6: Webhook SePay Nhận Tiền
     console.log('\n--- TEST 6: Webhook SePay/Ngân Hàng Tự Động Xác Nhận ---');
-    const webhookRes = await request(
-      'POST',
-      '/api/webhook/payment',
-      {
-        id: 88888,
-        gateway: 'MBBank',
-        transferAmount: createdOrder.amount,
-        content: `CHUYEN TIEN ${createdOrder.order_code}`,
-        referenceCode: 'FT99999999'
-      },
-      {
-        'x-api-key': 'sepay_webhook_secret_key'
-      }
-    );
+    const webhookPayload = {
+      id: 88888,
+      gateway: 'MBBank',
+      transferAmount: createdOrder.amount,
+      content: `CHUYEN TIEN ${createdOrder.bank.transfer_content}`,
+      referenceCode: 'FT99999999'
+    };
+    const timestamp = String(Math.floor(Date.now() / 1000));
+    const signature = `sha256=${crypto
+      .createHmac('sha256', process.env.SEPAY_WEBHOOK_SECRET)
+      .update(`${timestamp}.${JSON.stringify(webhookPayload)}`)
+      .digest('hex')}`;
+    const webhookRes = await request('POST', '/api/webhook/payment', webhookPayload, {
+      'x-sepay-timestamp': timestamp,
+      'x-sepay-signature': signature
+    });
 
     if (webhookRes.status !== 200 || !webhookRes.data.success) {
       throw new Error('Test 6 Failed: Webhook error');

@@ -383,7 +383,6 @@ router.post('/settings', requireAdminAuth, async (req, res) => {
       'telegram_bot_token',
       'telegram_chat_id',
       'telegram_notify_enabled',
-      'webhook_api_key',
       'site_notice'
     ];
 

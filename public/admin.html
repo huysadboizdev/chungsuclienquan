@@ -367,14 +367,14 @@
           </div>
         </div>
 
-        <!-- Webhook SePay / Casso -->
+        <!-- Webhook SePay HMAC-SHA256 -->
         <div class="settings-section">
           <div class="settings-title">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
               <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
             </svg>
-            4. Webhook Thanh Toán Tự Động (SePay / Casso / Ngân Hàng)
+            4. Webhook Thanh Toán Tự Động (SePay HMAC-SHA256)
           </div>
           <div class="form-group">
             <label class="form-label">Đường Dẫn Webhook Nhận Tiền (Dán vào SePay)</label>
@@ -385,9 +385,7 @@
             <p class="input-hint">Được tự động cấu hình từ <code>APP_URL</code> trong <code>.env</code>. Bạn có thể sửa trực tiếp hoặc chép dán vào SePay.</p>
           </div>
           <div class="form-group">
-            <label class="form-label">Webhook API Key (Khóa Bí Mật)</label>
-            <input type="text" id="set_webhook_api_key" class="form-input mono" placeholder="Chuỗi bí mật">
-            <p class="input-hint">Cấu hình API Key trong SePay trùng với chuỗi này để bảo mật.</p>
+            <p class="input-hint">Chọn HMAC-SHA256 trong SePay. Secret Key được cấu hình riêng trên máy chủ bằng biến <code>SEPAY_WEBHOOK_SECRET</code> trong file <code>.env</code>; không nhập secret vào trang quản trị.</p>
           </div>
         </div>
 
@@ -479,6 +477,6 @@
     </div>
   </div>
 
-  <script src="/js/admin.js"></script>
+  <script src="/js/admin.js?v=2"></script>
 </body>
 </html>

@@ -17,6 +17,10 @@ function generateOrderCode() {
   return `CSLK-${code}`;
 }
 
+function generatePaymentCode() {
+  return `CHUNGSUCHUYDEV${crypto.randomInt(0, 10_000_000_000).toString().padStart(10, '0')}`;
+}
+
 /**
  * GET /api/public/config
  * Lấy cấu hình công khai và danh sách gói dịch vụ đang bán
@@ -98,14 +102,22 @@ router.post('/orders/create', async (req, res) => {
       existing = await db.get(`SELECT id FROM orders WHERE order_code = ?`, [orderCode]);
     }
 
+    let paymentCode = generatePaymentCode();
+    existing = await db.get(`SELECT id FROM orders WHERE payment_code = ?`, [paymentCode]);
+    while (existing) {
+      paymentCode = generatePaymentCode();
+      existing = await db.get(`SELECT id FROM orders WHERE payment_code = ?`, [paymentCode]);
+    }
+
     // Lưu vào database
     const result = await db.run(
       `INSERT INTO orders (
-        order_code, invite_code, package_id, package_name, 
+        order_code, payment_code, invite_code, package_id, package_name,
         amount, status, contact_info
-      ) VALUES (?, ?, ?, ?, ?, 'pending', ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, 'pending', ?)`,
       [
         orderCode,
+        paymentCode,
         cleanedCode,
         pkg.id,
         pkg.name,
@@ -130,13 +142,14 @@ router.post('/orders/create', async (req, res) => {
       accountNo: settings.bank_account_no || '',
       template: settings.vietqr_template || 'compact2',
       amount: pkg.price,
-      orderCode: orderCode,
+      orderCode: paymentCode,
       accountName: settings.bank_account_name || ''
     });
 
     const newOrder = {
       id: result.lastID,
       order_code: orderCode,
+      payment_code: paymentCode,
       invite_code: cleanedCode,
       package_name: pkg.name,
       amount: pkg.price,
@@ -147,7 +160,7 @@ router.post('/orders/create', async (req, res) => {
         bank_id: settings.bank_id || 'MB',
         account_no: settings.bank_account_no || '',
         account_name: settings.bank_account_name || '',
-        transfer_content: orderCode
+        transfer_content: paymentCode
       },
       expires_in_minutes: 15
     };
@@ -180,7 +193,7 @@ router.get('/orders/status/:order_code', async (req, res) => {
     }
 
     const order = await db.get(
-      `SELECT id, order_code, invite_code, package_name, amount, status, contact_info, admin_note, created_at, updated_at
+      `SELECT id, order_code, payment_code, invite_code, package_name, amount, status, contact_info, admin_note, created_at, updated_at
        FROM orders 
        WHERE order_code = ?`,
       [orderCode]
@@ -212,7 +225,7 @@ router.get('/orders/status/:order_code', async (req, res) => {
         accountNo: settings.bank_account_no || '',
         template: settings.vietqr_template || 'compact2',
         amount: order.amount,
-        orderCode: order.order_code,
+        orderCode: order.payment_code || order.order_code,
         accountName: settings.bank_account_name || ''
       });
 
@@ -220,7 +233,7 @@ router.get('/orders/status/:order_code', async (req, res) => {
         bank_id: settings.bank_id || 'MB',
         account_no: settings.bank_account_no || '',
         account_name: settings.bank_account_name || '',
-        transfer_content: order.order_code
+        transfer_content: order.payment_code || order.order_code
       };
     }
 
