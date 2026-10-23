@@ -271,12 +271,21 @@
               <line x1="2" y1="12" x2="22" y2="12"></line>
               <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
             </svg>
-            1. Tên Miền / Địa Chỉ Web (APP_URL cấu hình trong .env)
+            1. Tên Miền Website (APP_URL)
+            <span class="env-badge">Đồng bộ .env</span>
           </div>
-          <div class="form-group">
-            <label class="form-label">Tên Miền / URL Chính Của Web (APP_URL)</label>
-            <input type="text" id="set_app_url" class="form-input mono" placeholder="VD: https://tenmiencuaban.com hoặc http://localhost:3000">
-            <p class="input-hint">Được tự động nạp từ biến <code>APP_URL</code> trong file <code>.env</code>. Bạn có thể sửa trực tiếp tại đây hoặc sửa file <code>.env</code>. Hai đường dẫn webhook bên dưới sẽ tự động cập nhật theo URL này.</p>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Địa Chỉ Web Chính</label>
+            <div class="input-wrapper">
+              <input type="text" id="set_app_url" class="form-input mono" placeholder="VD: https://yourdomain.com hoặc http://localhost:3000">
+              <button type="button" class="btn-paste" id="btn-copy-app-url">Chép URL</button>
+            </div>
+            <p class="input-hint">
+              Đồng bộ tự động từ biến <code>APP_URL</code> trong file <code>.env</code>. Toàn bộ link Webhook bên dưới sẽ tự động cập nhật theo tên miền này.
+            </p>
+            <div class="setting-callout">
+              💡 <b>Gợi ý:</b> Khi chạy thử ở máy tính thì để <code>http://localhost:3000</code>. Khi chạy thật trên VPS hoặc qua tên miền / Cloudflare Tunnel thì nhập URL thật (Ví dụ: <code>https://yourdomain.com</code>).
+            </div>
           </div>
         </div>
 

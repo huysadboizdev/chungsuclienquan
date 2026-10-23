@@ -357,6 +357,47 @@
   gap: 16px;
 }
 
+.env-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  font-size: 0.725rem;
+  font-weight: 700;
+  color: var(--primary);
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+  margin-left: 6px;
+}
+
+.setting-callout {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-left: 3px solid var(--primary);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-top: 10px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+[data-theme="dark"] .setting-callout {
+  background: #1e293b;
+  border-color: #334155;
+  border-left-color: var(--primary);
+  color: #94a3b8;
+}
+
+[data-theme="dark"] code {
+  background: #1e293b;
+  border-color: #334155;
+  color: #60a5fa;
+}
+
 /* Responsive Optimization */
 @media (max-width: 768px) {
   .admin-container {

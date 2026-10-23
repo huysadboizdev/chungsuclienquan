@@ -550,6 +550,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Copy App URL button
+  document.getElementById('btn-copy-app-url')?.addEventListener('click', () => {
+    const url = document.getElementById('set_app_url').value;
+    copyToClipboard(url, 'Tên miền website APP_URL');
+  });
+
   // Copy Webhook URL button
   document.getElementById('btn-copy-webhook-url')?.addEventListener('click', () => {
     const url = document.getElementById('webhook-url-display').value;
