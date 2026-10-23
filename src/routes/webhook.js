@@ -55,8 +55,18 @@ function verifyWebhookAuth(req, res, next) {
  */
 async function processTransactionItem(item) {
   // Lấy nội dung giao dịch từ payload SePay.
+  const transferType = String(item.transferType || '').toLowerCase();
+  if (transferType !== 'in') {
+    return { processed: false, reason: 'Transfer is not incoming' };
+  }
+
+  const rawAmount = item.transferAmount ?? item.amount ?? item.amountIn;
+  const amount = Number(rawAmount);
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return { processed: false, reason: 'Invalid transfer amount' };
+  }
+
   const content = item.content || item.description || item.subAccount || item.remarks || '';
-  const amount = Number(item.transferAmount || item.amount || item.amountIn || 0);
   const refCode = item.referenceCode || item.tid || item.id || 'WEBHOOK';
 
   const paymentCode = extractOrderCode(content);
@@ -78,7 +88,7 @@ async function processTransactionItem(item) {
   }
 
   // Kiểm tra số tiền (chấp nhận nếu chuyển đủ hoặc nhiều hơn)
-  if (amount > 0 && amount < order.amount) {
+  if (amount < order.amount) {
     console.warn(`Đơn ${order.order_code} chuyển thiếu tiền: Cần ${order.amount}, nhận ${amount}`);
     // Vẫn ghi chú lại
     await db.run(
@@ -89,14 +99,16 @@ async function processTransactionItem(item) {
   }
 
   // Cập nhật trạng thái sang 'processing' (Đang xử lý)
-  await db.run(
-    `UPDATE orders 
-     SET status = 'processing', payment_ref = ?, updated_at = datetime('now', 'localtime') 
-     WHERE id = ?`,
+  const claim = await db.run(
+    `UPDATE orders
+     SET status = 'processing', payment_ref = ?, updated_at = datetime('now', 'localtime')
+     WHERE id = ? AND status = 'pending'`,
     [String(refCode), order.id]
   );
+  if (claim.changes !== 1) {
+    return { processed: false, reason: `Order ${order.order_code} was already confirmed` };
+  }
 
-  // Bắn thông báo Telegram
   const updatedOrder = { ...order, status: 'processing', payment_ref: String(refCode) };
   notifyPaidOrder(updatedOrder).catch((err) =>
     console.error('Lỗi gửi Telegram khi webhook thanh toán thành công:', err.message)

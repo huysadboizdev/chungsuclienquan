@@ -49,6 +49,18 @@ async function request(method, path, body = null, headers = {}) {
   return { status: res.status, data: json, headers: res.headers };
 }
 
+async function postSignedWebhook(payload) {
+  const timestamp = String(Math.floor(Date.now() / 1000));
+  const signature = `sha256=${crypto
+    .createHmac('sha256', process.env.SEPAY_WEBHOOK_SECRET)
+    .update(`${timestamp}.${JSON.stringify(payload)}`)
+    .digest('hex')}`;
+  return request('POST', '/api/webhook/payment', payload, {
+    'x-sepay-timestamp': timestamp,
+    'x-sepay-signature': signature
+  });
+}
+
 async function runTests() {
   console.log('🚀 Chạy bộ kiểm thử tự động với CSDL cách ly (Isolated DB)...');
 
@@ -135,19 +147,60 @@ async function runTests() {
     const webhookPayload = {
       id: 88888,
       gateway: 'MBBank',
+      transferType: 'in',
       transferAmount: createdOrder.amount,
       content: `CHUYEN TIEN ${createdOrder.bank.transfer_content}`,
       referenceCode: 'FT99999999'
     };
-    const timestamp = String(Math.floor(Date.now() / 1000));
-    const signature = `sha256=${crypto
-      .createHmac('sha256', process.env.SEPAY_WEBHOOK_SECRET)
-      .update(`${timestamp}.${JSON.stringify(webhookPayload)}`)
-      .digest('hex')}`;
-    const webhookRes = await request('POST', '/api/webhook/payment', webhookPayload, {
-      'x-sepay-timestamp': timestamp,
-      'x-sepay-signature': signature
+
+    const outgoingOrderRes = await request('POST', '/api/orders/create', {
+      invite_code: 'CSLQ_TEST_HERO_998', package_id: pkgId, contact_info: '0988776655'
     });
+    const outgoingOrder = outgoingOrderRes.data.order;
+    const outgoingWebhook = await postSignedWebhook({
+      ...webhookPayload,
+      id: 88886,
+      transferType: 'out',
+      content: outgoingOrder.bank.transfer_content
+    });
+    const afterOutgoing = await request('GET', `/api/orders/status/${outgoingOrder.order_code}`);
+    if (outgoingWebhook.status !== 200 || afterOutgoing.data.order.status !== 'pending') {
+      throw new Error('Test 6 Failed: Outgoing transfer must not confirm payment');
+    }
+
+    const zeroAmountOrderRes = await request('POST', '/api/orders/create', {
+      invite_code: 'CSLQ_TEST_HERO_997', package_id: pkgId, contact_info: '0988776655'
+    });
+    const zeroAmountOrder = zeroAmountOrderRes.data.order;
+    const zeroAmountWebhook = await postSignedWebhook({
+      ...webhookPayload,
+      id: 88887,
+      transferAmount: 0,
+      content: zeroAmountOrder.bank.transfer_content
+    });
+    const afterZeroAmount = await request('GET', `/api/orders/status/${zeroAmountOrder.order_code}`);
+    if (zeroAmountWebhook.status !== 200 || afterZeroAmount.data.order.status !== 'pending') {
+      throw new Error('Test 6 Failed: Zero amount must not confirm payment');
+    }
+
+    const duplicateOrderRes = await request('POST', '/api/orders/create', {
+      invite_code: 'CSLQ_TEST_HERO_996', package_id: pkgId, contact_info: '0988776655'
+    });
+    const duplicateOrder = duplicateOrderRes.data.order;
+    const duplicatePayload = {
+      ...webhookPayload,
+      id: 88885,
+      content: duplicateOrder.bank.transfer_content
+    };
+    const duplicateResults = await Promise.all([
+      postSignedWebhook(duplicatePayload),
+      postSignedWebhook(duplicatePayload)
+    ]);
+    const successfulClaims = duplicateResults.filter((result) => result.data?.results?.[0]?.processed).length;
+    if (successfulClaims !== 1) {
+      throw new Error(`Test 6 Failed: Concurrent duplicate should claim payment once, got ${successfulClaims}`);
+    }
+    const webhookRes = await postSignedWebhook(webhookPayload);
 
     if (webhookRes.status !== 200 || !webhookRes.data.success) {
       throw new Error('Test 6 Failed: Webhook error');
@@ -183,6 +236,7 @@ async function runTests() {
     });
   } catch (err) {
     console.error('\n❌ KIỂM THỬ THẤT BẠI:', err.message);
+    process.exitCode = 1;
     if (server) server.close();
   }
 }
