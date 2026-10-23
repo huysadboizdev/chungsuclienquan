@@ -138,7 +138,7 @@ async function initDatabase() {
     telegram_chat_id: process.env.TELEGRAM_CHAT_ID || '',
     telegram_notify_enabled: '1',
     webhook_api_key: process.env.WEBHOOK_API_KEY || 'sepay_webhook_secret_key',
-    site_notice: 'Hệ thống hỗ trợ buff chung sức Liên Quân Mobile tự động 24/7. Vui lòng chuyển khoản đúng cú pháp mã đơn hàng!'
+    site_notice: 'Hệ thống Chung Sức Liên Quân Huy Dev hỗ trợ buff sự kiện tự động 24/7. Vui lòng chuyển khoản đúng cú pháp mã đơn hàng!'
   };
 
   for (const [key, value] of Object.entries(defaultSettings)) {
