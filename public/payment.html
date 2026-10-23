@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Thanh Toán Đơn Hàng VietQR - Chung Sức Liên Quân</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="app-header">
+      <a href="/" class="brand">
+        <div class="brand-icon">
+          <!-- Back SVG -->
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>THANH TOÁN VIETQR</h1>
+          <span id="order-code-badge">Mã đơn: Đang tải...</span>
+        </div>
+      </a>
+
+      <a href="/order" class="nav-link">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        Tra cứu
+      </a>
+    </header>
+
+    <!-- Main Payment Card -->
+    <main class="card" id="payment-card">
+      <!-- Status Box -->
+      <div class="status-banner pending" id="payment-status-box">
+        <div class="status-icon">
+          <!-- Spinner SVG -->
+          <svg class="spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle>
+            <path d="M12 2a10 10 0 0 1 10 10"></path>
+          </svg>
+        </div>
+        <div class="status-details">
+          <h4 id="status-title">Đang Chờ Chuyển Khoản...</h4>
+          <p id="status-subtitle">Mở ứng dụng Ngân hàng hoặc ví quét mã QR bên dưới</p>
+        </div>
+      </div>
+
+      <!-- QR Display -->
+      <div class="qr-container">
+        <div class="qr-box">
+          <img src="" alt="Mã VietQR" id="qr-image" class="qr-image">
+        </div>
+        <div class="timer-badge" id="timer-badge">
+          <!-- Clock SVG -->
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          Thời gian giữ đơn: <span id="countdown-timer" style="font-family: var(--font-mono); margin-left: 4px;">15:00</span>
+        </div>
+      </div>
+
+      <!-- Bank Transfer Details with 1-Click Copy -->
+      <div class="info-list" style="margin-top: 16px;">
+        <!-- Bank Name -->
+        <div class="info-row">
+          <span class="info-label">Ngân hàng</span>
+          <span class="info-value" id="bank-name">Đang tải...</span>
+        </div>
+
+        <!-- Account Number -->
+        <div class="info-row">
+          <span class="info-label">Số tài khoản</span>
+          <div class="info-value-wrap">
+            <span class="info-value mono" id="account-no">...</span>
+            <button type="button" class="btn-copy" id="copy-acc" title="Sao chép số tài khoản">
+              <!-- Copy SVG -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Account Holder -->
+        <div class="info-row">
+          <span class="info-label">Chủ tài khoản</span>
+          <span class="info-value" id="account-name">...</span>
+        </div>
+
+        <!-- Amount -->
+        <div class="info-row">
+          <span class="info-label">Số tiền</span>
+          <div class="info-value-wrap">
+            <span class="info-value mono" id="amount-text" style="color: #38bdf8; font-weight: 700;">...</span>
+            <button type="button" class="btn-copy" id="copy-amount" title="Sao chép số tiền">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Transfer Content (Crucial) -->
+        <div class="info-row" style="background: rgba(37, 99, 235, 0.08);">
+          <span class="info-label" style="color: #93c5fd; font-weight: 700;">Nội dung CK</span>
+          <div class="info-value-wrap">
+            <span class="info-value mono" id="transfer-content" style="color: #60a5fa; font-weight: 800; font-size: 1.05rem;">...</span>
+            <button type="button" class="btn-copy" id="copy-content" style="background: var(--primary); border-color: var(--primary); color: #fff;" title="Sao chép nội dung">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <p class="input-hint" style="margin-bottom: 20px; justify-content: center; text-align: center;">
+        ⚠️ <b>Lưu ý quan trọng:</b> Hãy chuyển đúng chính xác <b>Nội dung CK</b> để hệ thống tự động nhận diện và xử lý ngay lập tức.
+      </p>
+
+      <!-- Action Buttons -->
+      <div style="display: flex; gap: 10px; flex-direction: column;">
+        <button type="button" class="btn-primary" id="btn-check-now">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          TÔI ĐÃ CHUYỂN KHOẢN (KIỂM TRA NGAY)
+        </button>
+
+        <a href="/" class="btn-secondary" style="text-align: center;">
+          Quay lại trang chủ
+        </a>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>Sau khi tiền vào tài khoản, hệ thống sẽ tự động cập nhật trong vòng vài giây.</p>
+    </footer>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast-container">
+    <div class="toast" id="toast-message">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="toast-icon">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+      <span id="toast-text">Thông báo</span>
+    </div>
+  </div>
+
+  <script src="/js/payment.js"></script>
+</body>
+</html>

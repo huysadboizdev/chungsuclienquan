@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Trang Quản Trị Hệ Thống - Chung Sức Liên Quân</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+  <!-- Login Section (shown if not logged in) -->
+  <div id="login-section" class="container" style="display: none; padding-top: 60px;">
+    <div class="card" style="max-width: 420px; margin: 0 auto;">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <div class="brand-icon" style="margin: 0 auto 12px; width: 48px; height: 48px;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+        </div>
+        <h2 style="font-size: 1.25rem; font-weight: 700;">Đăng Nhập Quản Trị</h2>
+        <p style="font-size: 0.825rem; color: var(--text-muted); margin-top: 4px;">Hệ thống Chung Sức Liên Quân</p>
+      </div>
+
+      <form id="admin-login-form">
+        <div class="form-group">
+          <label class="form-label" for="admin-password">Mật khẩu quản trị</label>
+          <input 
+            type="password" 
+            id="admin-password" 
+            class="form-input" 
+            placeholder="Nhập mật khẩu admin" 
+            required
+            autocomplete="current-password"
+          >
+        </div>
+
+        <button type="submit" class="btn-primary" id="btn-login-submit">
+          ĐĂNG NHẬP VÀO BẢNG ĐIỀU KHIỂN
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Admin Main Dashboard (shown when logged in) -->
+  <div id="dashboard-section" class="admin-container" style="display: none;">
+    <!-- Admin Header -->
+    <header class="admin-header">
+      <div class="admin-title-wrap">
+        <div class="brand-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"></polyline>
+            <line x1="13" y1="19" x2="19" y2="13"></line>
+            <line x1="16" y1="16" x2="20" y2="20"></line>
+            <line x1="19" y1="21" x2="21" y2="19"></line>
+            <polyline points="14.5 6.5 18 3 21 3 21 6 17.5 9.5"></polyline>
+            <line x1="5" y1="14" x2="9" y2="18"></line>
+            <line x1="7" y1="17" x2="4" y2="20"></line>
+            <line x1="3" y1="19" x2="5" y2="21"></line>
+          </svg>
+        </div>
+        <div>
+          <h1 style="font-size: 1.15rem; font-weight: 700;">QUẢN TRỊ CHUNG SỨC</h1>
+          <span style="font-size: 0.75rem; color: var(--text-muted);">Admin Control Panel</span>
+        </div>
+      </div>
+
+      <!-- Tabs Navigation -->
+      <nav class="admin-tabs">
+        <button type="button" class="admin-tab-btn active" data-tab="tab-orders">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+          </svg>
+          Đơn Hàng (<span id="tab-orders-badge">0</span>)
+        </button>
+
+        <button type="button" class="admin-tab-btn" data-tab="tab-packages">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
+          </svg>
+          Gói Dịch Vụ
+        </button>
+
+        <button type="button" class="admin-tab-btn" data-tab="tab-settings">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          Cài Đặt
+        </button>
+
+        <a href="/" target="_blank" class="admin-tab-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+          Xem Web
+        </a>
+
+        <button type="button" class="admin-tab-btn" id="btn-admin-logout" style="color: var(--danger);">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          Thoát
+        </button>
+      </nav>
+    </header>
+
+    <!-- Stats Grid -->
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-header">
+          <span>DOANH THU HÔM NAY</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 14 14"></polyline>
+          </svg>
+        </div>
+        <div class="stat-value" id="stat-revenue-today" style="color: #38bdf8;">0 đ</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-header">
+          <span>TỔNG DOANH THU</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+        </div>
+        <div class="stat-value" id="stat-revenue-total" style="color: #4ade80;">0 đ</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-header">
+          <span>CẦN BUFF (ĐANG XỬ LÝ)</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+        </div>
+        <div class="stat-value" id="stat-processing-count" style="color: #facc15;">0</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-header">
+          <span>ĐÃ HOÀN THÀNH</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+        </div>
+        <div class="stat-value" id="stat-completed-count">0</div>
+      </div>
+    </section>
+
+    <!-- TAB 1: Quản lý Đơn Hàng -->
+    <div id="tab-orders" class="tab-content">
+      <div class="toolbar">
+        <div class="filter-group">
+          <select id="filter-status" class="select-filter">
+            <option value="all">Tất cả trạng thái</option>
+            <option value="processing" selected>⚡ Đang xử lý (Cần buff)</option>
+            <option value="pending">⏳ Chờ thanh toán</option>
+            <option value="completed">✅ Hoàn thành</option>
+            <option value="cancelled">❌ Đã hủy</option>
+          </select>
+
+          <input 
+            type="text" 
+            id="admin-search-input" 
+            class="form-input" 
+            placeholder="Tìm mã đơn hoặc mã CS..."
+            style="height: 40px;"
+          >
+
+          <button type="button" class="btn-secondary" id="btn-refresh-orders" style="height: 40px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <polyline points="1 20 1 14 7 14"></polyline>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+            Tải lại
+          </button>
+        </div>
+      </div>
+
+      <!-- Orders Table -->
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Mã Đơn</th>
+              <th>Thời Gian</th>
+              <th>Mã CS Liên Quân (1-Click Copy)</th>
+              <th>Gói / Số Tiền</th>
+              <th>Khách Hàng</th>
+              <th>Trạng Thái</th>
+              <th>Hành Động</th>
+            </tr>
+          </thead>
+          <tbody id="orders-tbody">
+            <tr>
+              <td colspan="7" style="text-align: center; padding: 24px; color: var(--text-muted);">
+                Đang tải danh sách đơn hàng...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px;">
+        <span style="font-size: 0.8rem; color: var(--text-muted);" id="orders-pagination-info">...</span>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" class="btn-secondary" id="btn-page-prev" style="height: 36px;">Trang trước</button>
+          <button type="button" class="btn-secondary" id="btn-page-next" style="height: 36px;">Trang sau</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: Quản lý Gói Dịch Vụ -->
+    <div id="tab-packages" class="tab-content" style="display: none;">
+      <div class="toolbar">
+        <h3 style="font-size: 1rem; font-weight: 700;">Danh Sách Gói Buff Chung Sức</h3>
+        <button type="button" class="btn-primary" id="btn-open-add-package" style="height: 40px; width: auto; padding: 0 16px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Thêm Gói Mới
+        </button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Tên Gói</th>
+              <th>Giá Tiền</th>
+              <th>Mô Tả / Quyền Lợi</th>
+              <th>Huy Hiệu (Badge)</th>
+              <th>Thứ Tự</th>
+              <th>Trạng Thái</th>
+              <th>Thao Tác</th>
+            </tr>
+          </thead>
+          <tbody id="packages-tbody">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 3: Cài Đặt Hệ Thống -->
+    <div id="tab-settings" class="tab-content" style="display: none;">
+      <form id="settings-form">
+        <!-- Ngân Hàng VietQR -->
+        <div class="settings-section">
+          <div class="settings-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+              <line x1="2" y1="10" x2="22" y2="10"></line>
+            </svg>
+            1. Cấu Hình Tài Khoản Ngân Hàng (VietQR Chuẩn NAPAS)
+          </div>
+          <div class="settings-grid">
+            <div class="form-group">
+              <label class="form-label">Mã Ngân Hàng (Bank ID)</label>
+              <input type="text" id="set_bank_id" class="form-input" placeholder="VD: MB, VCB, TCB, ACB, VPB..." required>
+              <p class="input-hint">Tra cứu đúng mã ngân hàng VietQR (MB, VCB, ICB, TCB, VPB...)</p>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Số Tài Khoản</label>
+              <input type="text" id="set_bank_account_no" class="form-input" placeholder="Số tài khoản ngân hàng" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tên Chủ Tài Khoản</label>
+              <input type="text" id="set_bank_account_name" class="form-input" placeholder="VD: NGUYEN VAN A" required>
+            </div>
+          </div>
+        </div>
+
+        <!-- Telegram Bot -->
+        <div class="settings-section">
+          <div class="settings-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+            2. Cấu Hình Telegram Bot Báo Đơn Thời Gian Thực
+          </div>
+          <div class="settings-grid">
+            <div class="form-group">
+              <label class="form-label">Telegram Bot Token</label>
+              <input type="text" id="set_telegram_bot_token" class="form-input" placeholder="VD: 123456789:ABCdefGhIjkLmNoP...">
+              <p class="input-hint">Tạo bot từ @BotFather trên Telegram</p>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Telegram Chat ID / Nhóm</label>
+              <input type="text" id="set_telegram_chat_id" class="form-input" placeholder="VD: 987654321 hoặc -100123456789">
+              <p class="input-hint">Lấy ID từ @userinfobot hoặc @RawDataBot</p>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Bật Thông Báo</label>
+              <select id="set_telegram_notify_enabled" class="form-input">
+                <option value="1">Bật gửi thông báo Telegram</option>
+                <option value="0">Tắt thông báo</option>
+              </select>
+            </div>
+          </div>
+          <button type="button" class="btn-secondary" id="btn-test-telegram" style="margin-top: 8px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+            Bấm để kiểm tra gửi tin nhắn thử lên Telegram
+          </button>
+        </div>
+
+        <!-- Webhook SePay / Casso -->
+        <div class="settings-section">
+          <div class="settings-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+            </svg>
+            3. Webhook Thanh Toán Tự Động (SePay / Casso / Ngân Hàng)
+          </div>
+          <div class="form-group">
+            <label class="form-label">Đường Dẫn Webhook Nhận Tiền (Dán vào SePay)</label>
+            <div class="input-wrapper">
+              <input type="text" id="webhook-url-display" class="form-input mono" readonly>
+              <button type="button" class="btn-paste" id="btn-copy-webhook-url">Chép URL</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Webhook API Key (Khóa Bí Mật)</label>
+            <input type="text" id="set_webhook_api_key" class="form-input mono" placeholder="Chuỗi bí mật">
+            <p class="input-hint">Cấu hình API Key trong SePay trùng với chuỗi này để bảo mật.</p>
+          </div>
+        </div>
+
+        <!-- Thông báo web & Mật khẩu -->
+        <div class="settings-section">
+          <div class="settings-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            4. Thông Báo Web & Đổi Mật Khẩu Admin
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nội Dung Thông Báo Đầu Web</label>
+            <textarea id="set_site_notice" class="form-input" style="height: 70px; padding: 10px 14px; resize: vertical;"></textarea>
+          </div>
+          <div class="form-group" style="max-width: 400px;">
+            <label class="form-label">Đổi Mật Khẩu Quản Trị Mới (Để trống nếu không đổi)</label>
+            <input type="password" id="set_new_password" class="form-input" placeholder="Nhập mật khẩu mới ít nhất 6 ký tự">
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary" id="btn-save-settings" style="max-width: 300px;">
+          LƯU TOÀN BỘ CÀI ĐẶT HỆ THỐNG
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Package (Add / Edit) -->
+  <div class="modal-backdrop" id="package-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-package-title">Thêm Gói Dịch Vụ Mới</h3>
+        <button type="button" class="btn-close" id="btn-close-package-modal">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form id="package-form">
+        <input type="hidden" id="pkg_id">
+        <div class="form-group">
+          <label class="form-label">Tên Gói Dịch Vụ</label>
+          <input type="text" id="pkg_name" class="form-input" placeholder="VD: Gói Cơ Bản 5 Lượt" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Giá Tiền (VNĐ)</label>
+          <input type="number" id="pkg_price" class="form-input mono" placeholder="VD: 25000" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mô Tả / Quyền Lợi</label>
+          <input type="text" id="pkg_description" class="form-input" placeholder="VD: Hỗ trợ 5 lượt buff sự kiện nhanh">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Huy Hiệu Nổi Bật (Tùy chọn)</label>
+          <input type="text" id="pkg_badge" class="form-input" placeholder="VD: Phổ biến, Khuyên dùng, VIP">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Thứ Tự Sắp Xếp</label>
+          <input type="number" id="pkg_sort_order" class="form-input mono" value="1">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Trạng Thái Bán</label>
+          <select id="pkg_is_active" class="form-input">
+            <option value="1">Đang mở bán (Hiển thị)</option>
+            <option value="0">Tạm ẩn</option>
+          </select>
+        </div>
+
+        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+          <button type="button" class="btn-secondary" id="btn-cancel-package">Hủy</button>
+          <button type="submit" class="btn-primary" style="width: auto; padding: 0 20px;">Lưu Gói</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast-container">
+    <div class="toast" id="toast-message">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="toast-icon">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+      <span id="toast-text">Thông báo</span>
+    </div>
+  </div>
+
+  <script src="/js/admin.js"></script>
+</body>
+</html>

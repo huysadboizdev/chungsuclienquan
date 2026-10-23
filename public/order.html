@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Tra Cứu & Trạng Thái Đơn Hàng - Chung Sức Liên Quân</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="app-header">
+      <a href="/" class="brand">
+        <div class="brand-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>TRA CỨU ĐƠN HÀNG</h1>
+          <span>Kiểm tra tiến trình buff mã chung sức</span>
+        </div>
+      </a>
+
+      <a href="/" class="nav-link">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Đặt đơn mới
+      </a>
+    </header>
+
+    <!-- Search Box Card -->
+    <div class="card" style="padding: 16px 20px; margin-bottom: 20px;">
+      <form id="search-form">
+        <div class="input-wrapper">
+          <input 
+            type="text" 
+            id="search_code" 
+            class="form-input code-input" 
+            placeholder="Nhập mã đơn hàng (VD: CSLK-883921)"
+            style="padding-right: 100px;"
+            autocomplete="off"
+            autocapitalize="characters"
+            required
+          >
+          <button type="submit" class="btn-paste" style="right: 8px; background: var(--primary); border-color: var(--primary); color: #fff;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            Tra cứu
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Order Result Card -->
+    <main class="card" id="order-result-card" style="display: none;">
+      <!-- Dynamic Status Banner -->
+      <div class="status-banner pending" id="order-status-banner">
+        <div class="status-icon" id="order-status-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+          </svg>
+        </div>
+        <div class="status-details">
+          <h4 id="order-status-title">Trạng thái</h4>
+          <p id="order-status-desc">Mô tả tiến độ đơn</p>
+        </div>
+      </div>
+
+      <!-- Timeline Stepper -->
+      <div class="timeline" id="order-timeline">
+        <!-- Step 1 -->
+        <div class="timeline-step done" id="step-1">
+          <div class="timeline-dot">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <div class="timeline-content">
+            <h4>1. Tạo đơn hàng</h4>
+            <p id="step-time-1">Đã khởi tạo đơn hàng thành công</p>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="timeline-step" id="step-2">
+          <div class="timeline-dot">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+            </svg>
+          </div>
+          <div class="timeline-content">
+            <h4>2. Thanh toán VietQR</h4>
+            <p id="step-desc-2">Chờ nhận tiền từ ngân hàng</p>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="timeline-step" id="step-3">
+          <div class="timeline-dot">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+            </svg>
+          </div>
+          <div class="timeline-content">
+            <h4>3. Đang buff chung sức</h4>
+            <p id="step-desc-3">Hệ thống đang hỗ trợ vào game</p>
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="timeline-step" id="step-4">
+          <div class="timeline-dot">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+            </svg>
+          </div>
+          <div class="timeline-content">
+            <h4>4. Hoàn thành</h4>
+            <p id="step-desc-4">Mã chung sức đã được buff đầy đủ</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Details List -->
+      <div class="info-list" style="margin-top: 24px;">
+        <div class="info-row">
+          <span class="info-label">Mã đơn hàng</span>
+          <div class="info-value-wrap">
+            <span class="info-value mono" id="detail-order-code">...</span>
+            <button type="button" class="btn-copy" id="btn-copy-order" title="Sao chép">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <span class="info-label">Mã CS Liên Quân</span>
+          <div class="info-value-wrap">
+            <span class="info-value mono" id="detail-invite-code" style="color: #f59e0b;">...</span>
+            <button type="button" class="btn-copy" id="btn-copy-invite" title="Sao chép">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <span class="info-label">Gói dịch vụ</span>
+          <span class="info-value" id="detail-package-name">...</span>
+        </div>
+
+        <div class="info-row">
+          <span class="info-label">Số tiền</span>
+          <span class="info-value mono" id="detail-amount" style="color: #60a5fa;">...</span>
+        </div>
+
+        <div class="info-row">
+          <span class="info-label">Thời gian tạo</span>
+          <span class="info-value" id="detail-created-at" style="font-size: 0.8rem; color: var(--text-muted);">...</span>
+        </div>
+
+        <div class="info-row" id="admin-note-row" style="display: none;">
+          <span class="info-label">Ghi chú</span>
+          <span class="info-value" id="detail-admin-note" style="color: #f87171;">...</span>
+        </div>
+      </div>
+
+      <!-- Action Button if pending -->
+      <div id="pending-action-wrap" style="display: none; margin-top: 16px;">
+        <a href="" id="btn-pay-link" class="btn-primary" style="text-decoration: none;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          MỞ MÃ VIETQR ĐỂ THANH TOÁN
+        </a>
+      </div>
+    </main>
+
+    <!-- Empty State / Guide -->
+    <div class="card" id="empty-state" style="text-align: center; padding: 36px 20px;">
+      <div style="color: var(--text-subtle); margin-bottom: 12px;">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </div>
+      <h3 style="font-size: 1rem; margin-bottom: 6px;">Tra Cứu Tiến Độ Đơn Hàng</h3>
+      <p style="font-size: 0.825rem; color: var(--text-muted); max-width: 400px; margin: 0 auto 20px;">
+        Nhập mã đơn hàng dạng <b>CSLK-XXXXXX</b> để kiểm tra trạng thái thanh toán và tiến độ buff sự kiện.
+      </p>
+      <a href="/" class="btn-secondary">Quay lại trang chủ</a>
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>© 2026 Chung Sức Liên Quân. Hỗ trợ khách hàng 24/7.</p>
+    </footer>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast-container">
+    <div class="toast" id="toast-message">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="toast-icon">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+      <span id="toast-text">Thông báo</span>
+    </div>
+  </div>
+
+  <script src="/js/order.js"></script>
+</body>
+</html>
