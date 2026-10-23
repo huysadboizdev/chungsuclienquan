@@ -1,4 +1,3 @@
-const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const fs = require('fs');
 
@@ -8,51 +7,96 @@ if (!fs.existsSync(dataDir)) {
 }
 
 const dbPath = process.env.DB_PATH || path.join(dataDir, 'database.sqlite');
-const rawDb = new sqlite3.Database(dbPath);
 
-// Promisified helper methods
-const db = {
-  raw: rawDb,
-  get(sql, params = []) {
-    return new Promise((resolve, reject) => {
-      rawDb.get(sql, params, (err, row) => {
-        if (err) return reject(err);
-        resolve(row);
-      });
-    });
-  },
-  all(sql, params = []) {
-    return new Promise((resolve, reject) => {
-      rawDb.all(sql, params, (err, rows) => {
-        if (err) return reject(err);
-        resolve(rows);
-      });
-    });
-  },
-  run(sql, params = []) {
-    return new Promise((resolve, reject) => {
-      rawDb.run(sql, params, function (err) {
-        if (err) return reject(err);
-        resolve({ lastID: this.lastID, changes: this.changes });
-      });
-    });
-  },
-  exec(sql) {
-    return new Promise((resolve, reject) => {
-      rawDb.exec(sql, (err) => {
-        if (err) return reject(err);
-        resolve();
-      });
-    });
+let dbDriver = null;
+
+// Kiểm tra xem Node.js hiện tại có hỗ trợ node:sqlite chuẩn không (Node 22+)
+let hasNodeSqlite = false;
+try {
+  const sqlite = require('node:sqlite');
+  if (sqlite && sqlite.DatabaseSync) {
+    hasNodeSqlite = true;
   }
-};
+} catch (e) {
+  hasNodeSqlite = false;
+}
 
-// Initialize schema and default data
+let db = null;
+
+if (hasNodeSqlite) {
+  const { DatabaseSync } = require('node:sqlite');
+  const syncDb = new DatabaseSync(dbPath);
+
+  db = {
+    raw: syncDb,
+    async get(sql, params = []) {
+      const stmt = syncDb.prepare(sql);
+      const row = Array.isArray(params) ? stmt.get(...params) : stmt.get(params);
+      return row ? { ...row } : undefined;
+    },
+    async all(sql, params = []) {
+      const stmt = syncDb.prepare(sql);
+      const rows = Array.isArray(params) ? stmt.all(...params) : stmt.all(params);
+      return rows.map((r) => ({ ...r }));
+    },
+    async run(sql, params = []) {
+      const stmt = syncDb.prepare(sql);
+      const info = Array.isArray(params) ? stmt.run(...params) : stmt.run(params);
+      return {
+        lastID: Number(info.lastInsertRowid),
+        changes: info.changes
+      };
+    },
+    async exec(sql) {
+      syncDb.exec(sql);
+    }
+  };
+} else {
+  // Fallback sang sqlite3 cho Node 18/20
+  const sqlite3 = require('sqlite3').verbose();
+  const rawDb = new sqlite3.Database(dbPath);
+
+  db = {
+    raw: rawDb,
+    get(sql, params = []) {
+      return new Promise((resolve, reject) => {
+        rawDb.get(sql, params, (err, row) => {
+          if (err) return reject(err);
+          resolve(row ? { ...row } : undefined);
+        });
+      });
+    },
+    all(sql, params = []) {
+      return new Promise((resolve, reject) => {
+        rawDb.all(sql, params, (err, rows) => {
+          if (err) return reject(err);
+          resolve((rows || []).map((r) => ({ ...r })));
+        });
+      });
+    },
+    run(sql, params = []) {
+      return new Promise((resolve, reject) => {
+        rawDb.run(sql, params, function (err) {
+          if (err) return reject(err);
+          resolve({ lastID: this.lastID, changes: this.changes });
+        });
+      });
+    },
+    exec(sql) {
+      return new Promise((resolve, reject) => {
+        rawDb.exec(sql, (err) => {
+          if (err) return reject(err);
+          resolve();
+        });
+      });
+    }
+  };
+}
+
+// Khởi tạo bảng và dữ liệu mẫu
 async function initDatabase() {
-  // Enable WAL mode for high concurrency
   await db.exec(`PRAGMA journal_mode = WAL;`);
 
-  // Create tables
   await db.exec(`
     CREATE TABLE IF NOT EXISTS packages (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -88,7 +132,7 @@ async function initDatabase() {
 
   // Seed default packages if empty
   const packageCount = await db.get(`SELECT COUNT(*) as count FROM packages`);
-  if (packageCount.count === 0) {
+  if (!packageCount || packageCount.count === 0) {
     const defaultPackages = [
       {
         name: 'Gói Cơ Bản (5 Lượt)',

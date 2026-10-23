@@ -13,11 +13,11 @@ function generateVietQRUrl({
   orderCode = '',
   accountName = ''
 }) {
-  const cleanBank = encodeURIComponent(bankId.trim());
-  const cleanAccount = encodeURIComponent(accountNo.trim());
-  const cleanTemplate = encodeURIComponent(template.trim() || 'compact2');
+  const cleanBank = encodeURIComponent((bankId || 'MB').trim());
+  const cleanAccount = encodeURIComponent((accountNo || '').trim());
+  const cleanTemplate = encodeURIComponent((template || 'compact2').trim());
   const cleanAmount = parseInt(amount, 10) || 0;
-  const cleanInfo = encodeURIComponent(orderCode.trim());
+  const cleanInfo = encodeURIComponent((orderCode || '').trim());
   const cleanName = encodeURIComponent((accountName || '').trim());
 
   return `https://img.vietqr.io/image/${cleanBank}-${cleanAccount}-${cleanTemplate}.png?amount=${cleanAmount}&addInfo=${cleanInfo}&accountName=${cleanName}`;
@@ -39,21 +39,27 @@ function cleanInviteCode(rawInput) {
   if (!rawInput || typeof rawInput !== 'string') return '';
   const trimmed = rawInput.trim();
 
-  // If it's a simple alphanumeric code (e.g. 6-16 characters without spaces)
+  // 1. Nếu người dùng chỉ nhập đúng mã (4-20 ký tự chữ số/gạch dưới)
   if (/^[A-Za-z0-9_-]{4,20}$/.test(trimmed)) {
     return trimmed;
   }
 
-  // If user pasted a URL with code parameter, e.g., ?code=XXXX or /share/XXXX
-  const urlParamMatch = trimmed.match(/[?&](?:code|invite|c)=([A-Za-z0-9_-]+)/i);
+  // 2. Nếu là đường dẫn URL có query param ?code=... hoặc ?c=... hoặc /share/...
+  const urlParamMatch = trimmed.match(/[?&](?:code|invite|c|token)=([A-Za-z0-9_-]+)/i);
   if (urlParamMatch) {
     return urlParamMatch[1];
   }
 
-  // Look for standalone uppercase code pattern in text
-  const codeMatch = trimmed.match(/([A-Za-z0-9]{6,16})/);
-  if (codeMatch) {
-    return codeMatch[1];
+  // 3. Nếu chuỗi có định dạng sau dấu hai chấm (ví dụ: "Mã: ABCD1234EF")
+  const colonMatch = trimmed.match(/:\s*([A-Za-z0-9_-]{5,20})/);
+  if (colonMatch) {
+    return colonMatch[1];
+  }
+
+  // 4. Tìm chuỗi chữ hoa/số độ dài 6-20 ký tự trong đoạn văn bản
+  const tokenMatch = trimmed.match(/\b([A-Za-z0-9_-]{6,20})\b/);
+  if (tokenMatch) {
+    return tokenMatch[1];
   }
 
   return trimmed;
