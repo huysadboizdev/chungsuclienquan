@@ -1,0 +1,18 @@
+{
+  "name": "chung-suc-lien-quan",
+  "version": "1.0.0",
+  "description": "Hệ thống web dịch vụ Chung Sức Liên Quân Mobile chuyên nghiệp",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node tests/test-flow.js"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "sqlite3": "^5.1.7"
+  }
+}
